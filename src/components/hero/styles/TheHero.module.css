@@ -1,0 +1,33 @@
+@media (max-width: 1024px) {
+    .container {
+      width: 60%;
+    }
+    .container > h2 {
+      font-size: 1.5rem;
+    }
+  
+    .container > p {
+      font-size: 0.9rem;
+    }
+  
+    .btn {
+      height: 50px !important;
+    }
+  }
+  
+  @media (max-width: 540px) {
+    .container {
+      text-align: center;
+      align-items: center !important;
+      margin: 0 auto !important;
+      padding-left: 0 !important;
+      padding-right: 1rem;
+      width: 85% !important;
+  
+    }
+  
+    .btn {
+      margin-top: 2rem;
+      height: 50px !important;
+    }
+  }
