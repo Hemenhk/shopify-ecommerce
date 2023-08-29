@@ -17,9 +17,9 @@ const TheLayout: FC<LayoutProps> = (props) => {
   const isHomePage = router.pathname === "/";
 
   return (
-    <Flex className={classes.bg}>
+    <>
       {isHomePage ? (
-        <Flex flexDirection={"column"}>
+        <Flex className={classes.bg} flexDirection={"column"}>
           <Flex flexDirection={"column"}>
             <TheAnnouncement />
             <MainNav />
@@ -30,9 +30,17 @@ const TheLayout: FC<LayoutProps> = (props) => {
           <TheFooter />
         </Flex>
       ) : (
-        ""
+        <Flex flexDirection={"column"}>
+          <Flex flexDirection={"column"}>
+            <MainNav />
+          </Flex>
+
+          <main>{props.children}</main>
+
+          <TheFooter />
+        </Flex>
       )}
-    </Flex>
+    </>
   );
 };
 

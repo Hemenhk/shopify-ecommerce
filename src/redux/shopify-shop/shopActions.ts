@@ -7,9 +7,8 @@ import {
   setProducts,
 } from "./shopSlice";
 
-import { AppDispatch, AppThunk } from "../store";
-import { CollectionItems, setCollection } from "./collectionSlice";
-import { createAsyncThunk, isRejectedWithValue } from "@reduxjs/toolkit";
+import { AppDispatch, RootState } from "../store";
+import { createAsyncThunk } from "@reduxjs/toolkit";
 
 interface ProductMetafieldsData {
   productByHandle: {
@@ -107,20 +106,57 @@ const client = Client.buildClient({
   apiVersion,
 });
 
-export const createCheckout = () => async (dispatch: AppDispatch) => {
-  const checkout = await client.checkout.create();
-  console.log("See the checkout complete", checkout);
-  localStorage.setItem("checkout_id", checkout.id);
-  dispatch(setCheckout({ checkout }));
+export const createCheckout = createAsyncThunk(
+  "checkout/createCheckout",
+  async () => {
+    try {
+      const checkout = await client.checkout.create();
+      console.log("See the checkout complete", checkout);
+      localStorage.setItem("checkout_id", checkout.id);
 
-  window.location.href = "https://hemenhk.github.io/demo-shopify/#/";
-};
+      return checkout;
+    } catch (error: any) {
+      console.log(error);
+    }
+  }
+);
 
-export const fetchCheckout =
-  (checkoutId: string) => async (dispatch: AppDispatch) => {
+export const fetchCheckout = createAsyncThunk(
+  "checkout/fetchCheckout",
+  async (checkoutId: string) => {
     const checkout = await client.checkout.fetch(checkoutId);
-    dispatch(setCheckout(checkout));
-  };
+    return checkout;
+  }
+);
+
+// export const createCheckout = () => async (dispatch: AppDispatch) => {
+//   const checkout = await client.checkout.create();
+//   console.log("See the checkout complete", checkout);
+//   localStorage.setItem("checkout_id", checkout.id);
+//   dispatch(setCheckout({ checkout }));
+
+//   window.location.href = "https://hemenhk.github.io/demo-shopify/#/";
+// };
+
+// export const fetchCheckout =
+//   (checkoutId: string) => async (dispatch: AppDispatch) => {
+//     const checkout = await client.checkout.fetch(checkoutId);
+//     dispatch(setCheckout(checkout));
+//   };
+
+// export const addItemToCheckout = createAsyncThunk(
+//   "checkout/addItemToCheckout",
+//   async (variantId: any, quantity) => {
+//     const lineItemsToAdd = [{ variantId, quantity }];
+//     const currentState = getState().checkout as RootState;
+//     const newCheckout = await client.checkout.addLineItems(
+//       currentState.checkout.id,
+//       lineItemsToAdd
+//     );
+
+//     return newCheckout;
+//   }
+// );
 
 export const addItemToCheckout =
   (variantId: string, quantity: number) =>

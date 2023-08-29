@@ -1,20 +1,30 @@
 import React, { FC, useEffect } from "react";
 
-import { useAppDispatch } from "../redux/store";
+import { RootState, useAppDispatch } from "../redux/store";
 
 import { Flex } from "@chakra-ui/react";
-import { fetchCollectionWithHandle } from "@/redux/shopify-shop/shopActions";
+import {
+  createCheckout,
+  fetchCollectionWithHandle,
+} from "@/redux/shopify-shop/shopActions";
 import TheHero from "@/components/hero/TheHero";
 
 import classes from "./styles/HomePage.module.css";
 import Collection from "./collections/[collectionHandle]";
+import { useSelector } from "react-redux";
 
 const HomePage: FC = () => {
   const dispatch = useAppDispatch();
 
+  const checkout = useSelector((state: RootState) => state.shop.checkout);
+  // console.log("Checkout in app.js", checkout);
+
+  // const completedOrder = checkout.completedAt;
+
   const hair: string = "hair";
 
   useEffect(() => {
+    dispatch(createCheckout());
     dispatch(fetchCollectionWithHandle(hair));
   }, [dispatch]);
 

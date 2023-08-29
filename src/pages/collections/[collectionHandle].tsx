@@ -8,6 +8,7 @@ import { fetchCollectionWithHandle } from "@/redux/shopify-shop/shopActions";
 
 import { Card, CardBody, Flex, Heading, Text } from "@chakra-ui/react";
 import { useRouter } from "next/router";
+import TheCollectionPrice from "@/components/products/collection/TheCollectionPrice";
 
 
 
@@ -89,10 +90,10 @@ const Collection: FC = () => {
                     {item?.title}
                   </Text>
                   <Flex gap={5}>
-                    {/* <CollectionPrice
+                    <TheCollectionPrice
                       price={item?.variants[0].price}
                       comparePrice={item?.variants[0].compareAtPrice}
-                    /> */}
+                    />
                   </Flex>
                 </Flex>
               </CardBody>
