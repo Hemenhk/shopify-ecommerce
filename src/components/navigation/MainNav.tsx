@@ -4,7 +4,8 @@ import { useHover } from "@uidotdev/usehooks";
 
 import logo from "../../assets/images/logo.png";
 import TheSideNav from "./sidenav/TheSideNav";
-
+import TheCartIcon from "../cart/TheCartIcon"
+import Link from "next/link";
 
 const MainNav = () => {
   const [hoverRef, isHovered] = useHover<HTMLDivElement>();
@@ -22,8 +23,12 @@ const MainNav = () => {
       ref={hoverRef}
     >
       <TheSideNav isHovered={isHovered} />
-      <Image src={logo} alt="logo" width={50} height={50} />
-      <Flex>Cart</Flex>
+      <Link href="/">
+        <Image src={logo} alt="logo" width={50} height={50} />
+      </Link>
+      <Flex>
+        <TheCartIcon isHovered={isHovered}/>
+      </Flex>
     </Flex>
   );
 };

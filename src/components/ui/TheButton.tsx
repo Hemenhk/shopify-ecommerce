@@ -5,9 +5,9 @@ import classes from "./styles/TheButton.module.css";
 
 interface ButtonProps {
   label: string;
-  onClick: () => {};
-  height: string;
-  disabled: boolean;
+  onClick?: () => {};
+  height?: string;
+  disabled?: boolean;
 }
 
 const TheButton: FC<ButtonProps> = ({ label, onClick, height, disabled }) => {

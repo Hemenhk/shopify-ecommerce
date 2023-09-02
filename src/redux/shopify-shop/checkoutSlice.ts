@@ -9,11 +9,13 @@ import {
 interface CheckoutState {
   checkout: Checkout;
   status: "loading" | "idle";
+  isCartOpen: boolean;
 }
 
 const initialState = {
   checkout: {},
   status: "idle",
+  isCartOpen: false,
 } as CheckoutState;
 
 const checkoutSlice = createSlice({
@@ -25,6 +27,9 @@ const checkoutSlice = createSlice({
         ...state.checkout,
         ...action.payload,
       };
+    },
+    setIsCartOpen(state, action) {
+      state.isCartOpen = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -52,8 +57,8 @@ const checkoutSlice = createSlice({
       builder.addCase(fetchCheckout.rejected, (state) => {
         state.status = "idle";
       });
-   
   },
 });
 
+export const {setCheckout, setIsCartOpen} = checkoutSlice.actions
 export default checkoutSlice;

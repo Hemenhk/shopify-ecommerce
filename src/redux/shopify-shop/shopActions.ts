@@ -1,13 +1,10 @@
+"use client";
+
 import Client from "shopify-buy";
 import { GraphQLClient } from "graphql-request";
-import {
-  setCheckout,
-  setIsCartOpen,
-  setProduct,
-  setProducts,
-} from "./shopSlice";
+import { setCheckout, setIsCartOpen } from "./checkoutSlice";
 
-import { AppDispatch, RootState } from "../store";
+import { AppDispatch } from "../store";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 
 interface ProductMetafieldsData {
@@ -31,10 +28,10 @@ interface ProductMetafieldsData {
   };
 }
 
-const fetchProductMetafields = async (productHandle: string) => {
-  const endpoint = `https://${process.env.REACT_APP_SHOPIFY_DOMAIN}/api/2021-07/graphql.json`;
+export const fetchProductMetafields = async (productHandle: string) => {
+  const endpoint = "https://hemen-dev.myshopify.com/api/2021-07/graphql.json";
   const storefrontAccessToken: string | undefined =
-    process.env.REACT_APP_SHOPIFY_API;
+    "95de33e587cd2baf92b82488c3347725";
 
   const query = `
     query getProductMetafields($handle: String!) {
@@ -100,7 +97,7 @@ if (storefrontAccessToken === undefined) {
 if (domain === undefined) {
   throw new Error("REACT_APP_SHOPIFY_DOMAIN is not defined");
 }
-const client = Client.buildClient({
+export const client = Client.buildClient({
   domain,
   storefrontAccessToken,
   apiVersion,
@@ -125,61 +122,37 @@ export const fetchCheckout = createAsyncThunk(
   "checkout/fetchCheckout",
   async (checkoutId: string) => {
     const checkout = await client.checkout.fetch(checkoutId);
+    console.log(checkout);
     return checkout;
   }
 );
 
-// export const createCheckout = () => async (dispatch: AppDispatch) => {
-//   const checkout = await client.checkout.create();
-//   console.log("See the checkout complete", checkout);
-//   localStorage.setItem("checkout_id", checkout.id);
-//   dispatch(setCheckout({ checkout }));
-
-//   window.location.href = "https://hemenhk.github.io/demo-shopify/#/";
-// };
-
-// export const fetchCheckout =
-//   (checkoutId: string) => async (dispatch: AppDispatch) => {
-//     const checkout = await client.checkout.fetch(checkoutId);
-//     dispatch(setCheckout(checkout));
-//   };
-
-// export const addItemToCheckout = createAsyncThunk(
-//   "checkout/addItemToCheckout",
-//   async (variantId: any, quantity) => {
-//     const lineItemsToAdd = [{ variantId, quantity }];
-//     const currentState = getState().checkout as RootState;
-//     const newCheckout = await client.checkout.addLineItems(
-//       currentState.checkout.id,
-//       lineItemsToAdd
-//     );
-
-//     return newCheckout;
-//   }
-// );
-
 export const addItemToCheckout =
   (variantId: string, quantity: number) =>
   async (dispatch: AppDispatch, getState: any) => {
-    const lineItemsToAdd = [{ variantId, quantity }];
-    const currentState = getState().shop;
-    const newCheckout = await client.checkout.addLineItems(
-      currentState.checkout.id,
-      lineItemsToAdd
-    );
+    try {
+      const lineItemsToAdd = [{ variantId, quantity }];
+      const currentState = getState().checkout;
+      const newCheckout = await client.checkout.addLineItems(
+        currentState.checkout.id,
+        lineItemsToAdd
+      );
 
-    dispatch(setCheckout(newCheckout));
-    dispatch(setIsCartOpen(true));
-    setTimeout(() => {
-      dispatch(setIsCartOpen(false));
-    }, 2000);
+      dispatch(setCheckout(newCheckout));
+      dispatch(setIsCartOpen(true));
+      setTimeout(() => {
+        dispatch(setIsCartOpen(false));
+      }, 2000);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
 export const updateLineItem =
   (lineItemId: string, quantity: number) =>
   async (dispatch: AppDispatch, getState: any) => {
     const lineItemsToUpdate = [{ id: lineItemId, quantity }];
-    const currentState = getState().shop;
+    const currentState = getState().checkout;
     const newCheckout = await client.checkout.updateLineItems(
       currentState.checkout.id,
       lineItemsToUpdate
@@ -191,7 +164,7 @@ export const updateLineItem =
 export const removeLineItem =
   (lineItemIdsToRemove: string[]) =>
   async (dispatch: AppDispatch, getState: any) => {
-    const currentState = getState().shop;
+    const currentState = getState().checkout;
     const newCheckout = await client.checkout.removeLineItems(
       currentState.checkout.id,
       lineItemIdsToRemove
@@ -199,26 +172,27 @@ export const removeLineItem =
     dispatch(setCheckout(newCheckout));
   };
 
-export const fetchAllProducts = () => async (dispatch: AppDispatch) => {
-  const products = await client.product.fetchAll();
-  dispatch(setProducts(products));
-};
+export const fetchAllProducts = createAsyncThunk(
+  "product/fetchAllProducts",
+  async () => {
+    const products = await client.product.fetchAll();
+    return products;
+  }
+);
 
-export const fetchProductWithHandle =
-  (handle: string) => async (dispatch: AppDispatch) => {
+export const fetchProductWithHandle = createAsyncThunk(
+  "product/fetchProductWithHandle",
+  async (handle: string, { rejectWithValue }) => {
     try {
       const product = await client.product.fetchByHandle(handle);
-      // console.log(product);
-
-      // Fetch metafields with the given handle
       const metafields = await fetchProductMetafields(handle);
-      // console.log("Metafields:", metafields);
 
-      dispatch(setProduct({ ...product, metafields }));
+      return { ...product, metafields };
     } catch (error) {
-      console.log("Error fetching product:", error);
+      return rejectWithValue(error);
     }
-  };
+  }
+);
 
 export const fetchCollectionWithHandle = createAsyncThunk(
   "collection/withHandle",
@@ -226,7 +200,7 @@ export const fetchCollectionWithHandle = createAsyncThunk(
     try {
       const collection = await client.collection.fetchByHandle(handle);
       console.log("Collection in Actions", collection);
-      return collection.products;
+      return collection;
     } catch (error: any) {
       console.log(error);
       return rejectWithValue(error.message);
@@ -234,21 +208,14 @@ export const fetchCollectionWithHandle = createAsyncThunk(
   }
 );
 
-// export const fetchCollectionWithHandle =
-//   (handle: string) => async (dispatch: AppDispatch) => {
-//     try {
-//       const collection: CollectionItems[] =
-//         await client.collection.fetchByHandle(handle);
-//       dispatch(setCollection(collection));
-//       console.log("Collection", collection);
-//     } catch (error) {
-//       console.log(error);
-//     }
-//   };
-
-export const fetchCollections = () => async (dispatch: AppDispatch) => {
-  try {
-    const collection: CollectionItems[] = await client.collection.fetchAll();
-    dispatch(setCollection(collection));
-  } catch (error) {}
-};
+export const fetchCollections = createAsyncThunk(
+  "collection/fetchCollections",
+  async () => {
+    try {
+      const collection = await client.collection.fetchAll();
+      return collection;
+    } catch (error: any) {
+      console.log(error);
+    }
+  }
+);

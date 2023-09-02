@@ -1,18 +1,23 @@
 import { Action, combineReducers, configureStore } from "@reduxjs/toolkit";
 
-import shopSlice from "./shopify-shop/shopSlice";
-import  { ThunkAction } from "redux-thunk";
+import thunk, { ThunkAction } from "redux-thunk";
 import { useDispatch, TypedUseSelectorHook, useSelector } from "react-redux";
 import collectionSlice from "./shopify-shop/collectionSlice";
 import checkoutSlice from "./shopify-shop/checkoutSlice";
+import productSlice from "./shopify-shop/productSlice";
 
 const rootReducer = combineReducers({
-  shop: shopSlice.reducer,
   collection: collectionSlice.reducer,
   checkout: checkoutSlice.reducer,
+  product: productSlice.reducer,
 });
 
-const store = configureStore({ reducer: rootReducer });
+const store = configureStore({
+  reducer: rootReducer,
+  middleware: (getDefaultMiddleware) => getDefaultMiddleware({
+    serializableCheck: false
+  }),
+});
 
 export type RootState = ReturnType<typeof store.getState>;
 

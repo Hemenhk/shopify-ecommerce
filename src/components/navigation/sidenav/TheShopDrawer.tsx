@@ -32,13 +32,13 @@ const TheShopDrawer: FC = () => {
           }`}
         >
           <li>
-            <Link href="/collection/beard">Beard</Link>
+            <Link href="/collections/beard">Beard</Link>
           </li>
           <li>
-            <Link href="/collection/hair">Hair</Link>
+            <Link href="/collections/hair">Hair</Link>
           </li>
           <li>
-            <Link href="/collection/bundle">Kits</Link>
+            <Link href="/collections/bundle">Kits</Link>
           </li>
         </ul>
       </Flex>

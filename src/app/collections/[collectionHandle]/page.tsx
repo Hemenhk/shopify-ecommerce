@@ -1,24 +1,25 @@
+"use client";
+
 import React, { FC, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useParams } from "next/navigation";
 import { useSelector } from "react-redux";
 
 import { RootState, useAppDispatch } from "@/redux/store";
 import { fetchCollectionWithHandle } from "@/redux/shopify-shop/shopActions";
 
-import { Card, CardBody, Flex, Heading, Text } from "@chakra-ui/react";
-import { useRouter } from "next/router";
+import { Card, CardBody, Flex, Heading } from "@chakra-ui/react";
+
 import TheCollectionPrice from "@/components/products/collection/TheCollectionPrice";
+import TheText from "@/components/ui/TheText";
 
-
-
-const Collection: FC = () => {
-  const collection = useSelector((state: RootState) => state.collection.collection);
-  console.log(collection)
-  const router = useRouter();
-  const collectionHandle =
-    (router.query.collectionHandle as string) || undefined;
+const Collection: FC = ({params}) => {
+  const collection = useSelector(
+    (state: RootState) => state.collection.collection
+  );
   const dispatch = useAppDispatch();
+  const collectionHandle = params
 
   useEffect(() => {
     if (collectionHandle) {
@@ -29,8 +30,8 @@ const Collection: FC = () => {
   if (collection.length === 0) {
     return <div>Loading...</div>;
   }
-  
-  const collectionTitle = collection[0]?.title
+
+  const collectionTitle = collection?.title;
 
   return (
     <Flex flexDirection={"column"} alignItems={"center"} gap={5} padding={10}>
@@ -43,8 +44,8 @@ const Collection: FC = () => {
         {collectionTitle}
       </Heading>
       <Flex flexWrap={"wrap"} justifyContent={"center"} gap={5}>
-        {collection.length > 0 &&
-          collection.map((item: any) => (
+        {collection.products.length > 0 &&
+          collection.products.map((item: any) => (
             <Card key={item?.id}>
               <CardBody opacity={item.availableForSale ? 1 : 0.5}>
                 <Link href={`/products/${item.handle}`}>
@@ -57,38 +58,21 @@ const Collection: FC = () => {
                     />
                   </Flex>
                   {!item.availableForSale && (
-                    <Text
-                      position="absolute"
-                      top="50%"
-                      left="50%"
-                      transform="translate(-50%, -50%)"
-                      color="white"
-                      fontFamily={"inter"}
-                      fontWeight="bold"
-                      fontSize="12px"
-                      textAlign={"center"}
-                      textTransform={"uppercase"}
-                      bg="rgba(0, 0, 0, 0.8)"
+                    <TheText
+                      text={"Out of Stock"}
+                      position={"absolute"}
+                      top={"40%"}
+                      left={"10%"}
+                      color={"white"}
+                      bg={"rgba(0, 0, 0, 0.8)"}
                       padding={"10px 15px"}
-                      borderRadius="2px"
-                    >
-                      Out of Stock
-                    </Text>
+                      textAlign={"center"}
+                    />
                   )}
                 </Link>
                 <Flex flexDirection={"column"} gap={3} pt={5}>
-                  <Text
-                    fontFamily={"noto sans"}
-                    fontWeight={500}
-                    textTransform={"uppercase"}
-                    w={200}
-                    whiteSpace={"nowrap"}
-                    overflow={"hidden"}
-                    textOverflow={"ellipsis"}
-                    letterSpacing={1}
-                  >
-                    {item?.title}
-                  </Text>
+                  <TheText text={item?.title} />
+
                   <Flex gap={5}>
                     <TheCollectionPrice
                       price={item?.variants[0].price}

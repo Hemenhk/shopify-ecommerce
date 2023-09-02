@@ -1,3 +1,5 @@
+"use client"
+
 import React, { FC, useRef } from "react";
 
 import { FiMenu } from "react-icons/fi";
@@ -11,8 +13,9 @@ import {
   DrawerOverlay,
   useDisclosure,
 } from "@chakra-ui/react";
-import { useRouter } from "next/router";
+
 import TheNavLinks from "./TheNavLinks";
+import { usePathname } from "next/navigation";
 // import NavLinks from "../navlinks/NavLinks";
 
 interface SideNavProps {
@@ -22,9 +25,9 @@ interface SideNavProps {
 const TheSideNav: FC<SideNavProps> = ({ isHovered }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const btnRef = useRef<HTMLButtonElement>(null);
-  const router = useRouter();
+  const pathname = usePathname();
 
-  const isHomePage = router.pathname === "/";
+  const isHomePage = pathname === "/";
 
   const colorValue = isHomePage
     ? `${isHovered ? "black" : "white"}`
@@ -54,7 +57,9 @@ const TheSideNav: FC<SideNavProps> = ({ isHovered }) => {
             <DrawerCloseButton size={"lg"} />
           </DrawerHeader>
 
-          <DrawerBody><TheNavLinks /></DrawerBody>
+          <DrawerBody>
+            <TheNavLinks />
+          </DrawerBody>
         </DrawerContent>
       </Drawer>
     </>
